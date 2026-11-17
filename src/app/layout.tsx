@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Deltawash | Fila Virtual y Seguimiento en Vivo",
@@ -19,7 +16,7 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${inter.className} min-h-screen flex flex-col`}
+        className="font-sans min-h-screen flex flex-col"
       >
         {children}
       </body>
