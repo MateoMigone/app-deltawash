@@ -8,6 +8,7 @@ import {
   CONFIGURACION_POR_DEFECTO,
 } from "@/services/lavaderoService";
 import { ConfiguracionGlobal, TurnoActivo } from "@/types/lavadero";
+import { TurnoActivoBanner } from "@/components/ui/TurnoActivoBanner";
 
 export default function SemaforoPublicoPage() {
   const [turnos, setTurnos] = useState<TurnoActivo[]>([]);
@@ -99,19 +100,24 @@ export default function SemaforoPublicoPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between px-6 py-10 max-w-md mx-auto w-full">
       {/* Cabecera de marca */}
-      <header className="flex items-center justify-center gap-2.5 pt-2">
-        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30">
-          <Car className="w-6 h-6 text-white" />
-        </div>
-        <div className="text-left">
-          <span className="text-xl font-black tracking-tight text-white block leading-none">
-            DELTAWASH
-          </span>
-          <span className="text-xs text-slate-400 font-medium">
-            Estado del lavadero en vivo
-          </span>
-        </div>
-      </header>
+      <div className="space-y-4">
+        <header className="flex items-center justify-center gap-2.5 pt-2">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30">
+            <Car className="w-6 h-6 text-white" />
+          </div>
+          <div className="text-left">
+            <span className="text-xl font-black tracking-tight text-white block leading-none">
+              DELTAWASH
+            </span>
+            <span className="text-xs text-slate-400 font-medium">
+              Estado del lavadero en vivo
+            </span>
+          </div>
+        </header>
+
+        {/* Recuperación de turno activo si el cliente cerró la pestaña por error */}
+        <TurnoActivoBanner />
+      </div>
 
       {/* Cuerpo central: Semáforo Público */}
       <section className="my-auto py-8 flex flex-col items-center text-center">

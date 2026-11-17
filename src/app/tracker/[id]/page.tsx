@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Clock,
@@ -15,7 +15,12 @@ import {
   suscribirTurnoPorId,
   suscribirTurnosActivos,
 } from "@/services/lavaderoService";
-import { TurnoActivo } from "@/types/lavadero";
+import {
+  guardarTurnoLocal,
+  limpiarTurnoLocal,
+  obtenerTurnoLocal,
+} from "@/lib/turnoStorage";
+import { EstadoTurno, TurnoActivo } from "@/types/lavadero";
 
 export default function TrackerPage() {
   const params = useParams<{ id: string }>();
@@ -24,6 +29,7 @@ export default function TrackerPage() {
   const [turno, setTurno] = useState<TurnoActivo | null>(null);
   const [turnosActivos, setTurnosActivos] = useState<TurnoActivo[]>([]);
   const [cargando, setCargando] = useState(true);
+  const estadoAnteriorRef = useRef<EstadoTurno | null>(null);
 
   useEffect(() => {
     if (!turnoId) return;
@@ -32,6 +38,33 @@ export default function TrackerPage() {
     const unsubTurno = suscribirTurnoPorId(
       turnoId,
       (data) => {
+        if (data) {
+          // Persistir en localStorage para recuperar si cierra la pestaña por error
+          guardarTurnoLocal(data.id, data.patente);
+
+          // Disparar vibración en el celular cuando el auto pasa a estado "listo"
+          if (
+            data.estado === "listo" &&
+            estadoAnteriorRef.current !== "listo"
+          ) {
+            try {
+              if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+                navigator.vibrate([300, 120, 300, 120, 500]);
+              }
+            } catch {
+              // Ignorar si el navegador o sistema operativo bloquea la API de vibración
+            }
+          }
+
+          estadoAnteriorRef.current = data.estado;
+        } else {
+          // Si el turno ya fue entregado y eliminado de turnos_activos, limpiar localStorage
+          if (obtenerTurnoLocal()?.id === turnoId) {
+            limpiarTurnoLocal();
+          }
+          estadoAnteriorRef.current = null;
+        }
+
         setTurno(data);
         setCargando(false);
       },

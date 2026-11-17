@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { Car, Phone, ArrowRight, QrCode } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { TurnoActivoBanner } from "@/components/ui/TurnoActivoBanner";
 import { crearTurnoCheckin } from "@/services/lavaderoService";
+import { guardarTurnoLocal } from "@/lib/turnoStorage";
 
 export default function CheckinPage() {
   const router = useRouter();
@@ -36,6 +38,7 @@ export default function CheckinPage() {
       setEnviando(true);
       setError("");
       const nuevoTurnoId = await crearTurnoCheckin(patente, telefono);
+      guardarTurnoLocal(nuevoTurnoId, patente);
       router.push(`/tracker/${nuevoTurnoId}`);
     } catch (err) {
       console.error("Error al registrar turno:", err);
@@ -48,22 +51,26 @@ export default function CheckinPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between px-6 py-8 max-w-md mx-auto w-full">
-      {/* Encabezado minimalista */}
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/30">
-            <Car className="w-5 h-5 text-white" />
+      {/* Encabezado minimalista + Banner de recuperación si ya tenía un turno activo */}
+      <div className="space-y-4">
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-600/30">
+              <Car className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-black tracking-tight text-white">
+              DELTAWASH
+            </span>
           </div>
-          <span className="text-lg font-black tracking-tight text-white">
-            DELTAWASH
-          </span>
-        </div>
 
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
-          <QrCode className="w-3.5 h-3.5" />
-          Check-in Rápido
-        </span>
-      </header>
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
+            <QrCode className="w-3.5 h-3.5" />
+            Check-in Rápido
+          </span>
+        </header>
+
+        <TurnoActivoBanner />
+      </div>
 
       {/* Formulario ultra minimalista */}
       <section className="my-auto py-6 space-y-6">
